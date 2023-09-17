@@ -5,7 +5,7 @@ public class Restaurante {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("*****WELCOME*****");
+        System.out.println("*****GESTIÓN DE PEDIDOS EN UN RESTAURANTE*****");
 
         boolean aux = true;
         while (aux) {
@@ -23,53 +23,87 @@ public class Restaurante {
 
                 case 1:
 
-                System.out.println("Ingrese codigo del pedido: ");
-                String code = scanner.nextLine();
+                System.out.println("Ingrese su documento: ");
+                String document = scanner.nextLine();
 
-                System.out.println("Ingrese elementos del pedido: ");
-                String elements = scanner.nextLine();
+                    String newdocument = Select_admin(document);
+                    if (newdocument.equals("Administrador")) {
 
-                System.out.print("Ingrese el estado del pedido: ");
-                String state = scanner.nextLine();
+                        System.out.println("Ingrese codigo del pedido: ");
+                        String code = scanner.nextLine();
 
-                System.out.println("Ingrese el nombre del cliente: ");
-                String name = scanner.nextLine();
+                        System.out.println("Ingrese elementos del pedido: ");
+                        String elements = scanner.nextLine();
 
-                System.out.println("Ingrese el valor de pedido: ");
-                String value = scanner.nextLine();
+                        System.out.print("Ingrese el estado del pedido: ");
+                        String state = scanner.nextLine();
 
-                System.out.println("Ingrese su metodo de pago: ");
-                String payment = scanner.nextLine();
+                        System.out.println("Ingrese el nombre del cliente: ");
+                        String name = scanner.nextLine();
 
-                Insert(code, elements, state, name, value, payment);
+                        System.out.println("Ingrese el valor de pedido: ");
+                        String value = scanner.nextLine();
+
+                        System.out.println("Ingrese su metodo de pago: ");
+                        String payment = scanner.nextLine();
+
+                        Insert(code, elements, state, name, value, payment);
+                    }else{
+                        System.out.println("tu cargo: " + newdocument + " no coincide con el cargo de Administrado");
+                    }
 
                 break;
 
                 case 2:
 
-                    System.out.println("Ingrese el codigo del pedido: ");
-                    code = scanner.nextLine();
+                    System.out.println("Ingrese su documento: ");
+                    document = scanner.nextLine();
 
-                    Editar(code);
+                    newdocument = Select_admin(document);
+                    if (newdocument.equals("Cocinero")) {
 
+                        System.out.println("Ingrese el codigo del pedido: ");
+                        String code = scanner.nextLine();
+
+                        Editar(code);
+                    }else{
+                        System.out.println("tu cargo: " + newdocument + " no coincide con el cargo de Cocinero");
+                    }
                     break;
 
                 case 3:
 
-                    System.out.println("Ingrese el codigo del pedido: ");
-                    code = scanner.nextLine();
+                    System.out.println("Ingrese su documento: ");
+                    document = scanner.nextLine();
 
-                    Editar_serve(code);
+                    newdocument = Select_admin(document);
+                    if (newdocument.equals("Camarero")) {
+                        System.out.println("usuario no se encuentra registrado");
 
+                        System.out.println("Ingrese el codigo del pedido: ");
+                        String code = scanner.nextLine();
+
+                        Editar_serve(code);
+                    }else{
+                        System.out.println("tu cargo: " + newdocument + " no coincide con el cargo de Camarero");
+                    }
                     break;
 
                 case 4:
 
-                    System.out.println("Ingrese el codigo del pedido: ");
-                    code = scanner.nextLine();
+                    System.out.println("Ingrese su documento: ");
+                    document = scanner.nextLine();
 
-                    Select_One(code);
+                    newdocument = Select_admin(document);
+                    if (newdocument.equals("")) {
+                        System.out.println("usuario no se encuentra registrado");
 
+                    }else {
+                        System.out.println("Ingrese el codigo del pedido: ");
+                        String code = scanner.nextLine();
+
+                        Select_One(code);
+                    }
                     break;
 
                 case 5:
@@ -85,6 +119,43 @@ public class Restaurante {
             }
 
         }
+    }
+
+    private static String Select_admin(String document) throws ClassNotFoundException, SQLException {
+
+        String driver = "com.mysql.cj.jdbc.Driver";
+        String url = "jdbc:mysql://localhost:3306/restaurante";
+        String username = "root";
+        String password = "";
+
+        Class.forName(driver);
+        Connection connection = DriverManager.getConnection(url, username, password);
+
+        String consultaSQL = "SELECT * FROM funcionarios WHERE documento = ?";
+
+        PreparedStatement statement = connection.prepareStatement(consultaSQL);
+        statement.setString(1, document); // Establecer el valor del parámetro
+
+        // Ejecutar la consulta
+        ResultSet resultSet = statement.executeQuery();
+
+        // Procesar el resultado si existe
+        if (resultSet.next()) {
+            String documento = resultSet.getString("documento");
+            String cargo = resultSet.getString("cargo");
+
+            // Cerrar recursos
+            resultSet.close();
+            statement.close();
+            connection.close();
+
+            return cargo;
+
+        }else{
+            System.out.println("Este documento no se encuentra registrado como funcionario del restaurante");
+        }
+
+        return "";
     }
 
     private static void Select_One(String code) throws ClassNotFoundException, SQLException {
